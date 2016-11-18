@@ -1,0 +1,7 @@
+*.pyc
+*~
+__pycache__
+myvenv
+gldata.db
+/static
+.DS_Store
