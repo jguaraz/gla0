@@ -1,0 +1,25 @@
+{% load staticfiles %}
+<html>
+<head>
+	<link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+	<title>Test page</title>
+</head>
+<body>
+    <div class="page-header">
+    	<a href="{% url 'g_new' %}" class="top-menu"><span class="glyphicon glyphicon-plus"></span></a>
+        <h1 align="center"><a href="/">Test Page</a></h1>
+    </div>
+    <div class="content container">
+        <div class="row">
+            <div class="col-md-8">
+            	<table>	
+            		<tbody>
+		            {% block content %}
+		            {% endblock %}
+		            </tbody>
+            	</table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,10 @@
+{% extends 'gl0/base.html' %}
+
+{% block content %}
+	{% for record in list %}
+		<tr>
+			<td><a href="">	{{ record.datetime }}  </td>
+			<td> &nbsp; {{ record.value }} &nbsp; </a></td>
+		</tr>
+	{% endfor %}
+{% endblock content %}
