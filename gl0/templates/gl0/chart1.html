@@ -1,0 +1,15 @@
+{% load staticfiles %}
+<head>
+    <!-- code to include the highcharts and jQuery libraries goes here -->
+    
+    <script type="text/javascript" src="{% static 'js/jquery-1.12.1.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/demo.js' %}"></script>
+	<style type="text/css">
+		${demo.css}
+	</style>
+</head>
+<body>
+    <script type="text/javascript" src="{% static 'js/highcharts.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/modules/exporting.js' %}"></script>
+    <div id='container'></div>
+</body>

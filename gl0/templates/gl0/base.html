@@ -1,6 +1,8 @@
 {% load staticfiles %}
 <html>
 <head>
+	{% block extrahead %}
+	{% endblock %}
 	<link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
 	<title>Test page</title>
 </head>

@@ -1,0 +1,26 @@
+{% load staticfiles %}
+<html>
+<head>
+<link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+<!-- Load in jQuery and HighCharts -->
+<script type="text/javascript" src="{% static 'js/jquery-1.12.1.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/highcharts.js' %}"></script>
+
+{% block extrahead %}
+{% endblock %}
+
+</head>
+<body>
+{% block heading %}
+{% endblock %}
+{% block overwrite %}
+{% endblock %}
+<div class='container' align="center">
+{% block content %}
+{% endblock %}
+
+</div>
+{% block extrajs %}
+{% endblock %}
+</body>
+</html>
