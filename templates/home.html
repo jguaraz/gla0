@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container">
+    <div class="row">
+        <div class="jumbotron">
+            <h1>Hello
+				{% if user.is_authenticated %}
+				    {{ user.first_name }}
+				{% else %}
+				    Visitor
+				{% endif %}
+			</h1>
+        </div>
+            <p>This is GL0 homepage</p>
+            <p>This site is meant to be a reference control for your gluchemia level</p>
+            <p>This site is not meant to control and manage your own health which depends 
+            exclusivly on what you do and how you follow your doctor's direction</p>
+            
+    </div>
+</div>
+{% endblock %}

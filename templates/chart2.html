@@ -1,14 +1,19 @@
-{% extends "gl0/base0.html" %}
+{% extends "base.html" %}
 
 {% block extrahead %}
 {% endblock %}
 
 {% block heading %}
     <h1 align="center">Analysis</h1>
+    <h2 align="center">Glucose level and trend for {{ user.first_name }}</h2>
 {% endblock %}
 
 {% block content %}
-    <div id={{ chartID|safe }} class="chart" style="height:100px; width:80%"></div>
+	{% if user.is_authenticated %}
+	    <div id={{ chartID|safe }} class="chart" style="height:100px; width:80%"></div>
+	{% else %}
+		<h1 align="center">Nothing to see here</h1>
+	{% endif %}
 {% endblock %}
 
 {% block overwrite %}

@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class=container>
+{% if not user.is_authenticated %}
+	<h1 align="center">Forbidden</h1>
+	<p>You are not authorized to access this page. Please login.</p>
+{% else %}
+
+	<h1>Hello {{ user.first_name }} </h1>
+	<table>
+	{% for record in list %}
+		<tr>
+			<td><a href="">	{{ record.datetime }}  </td>
+			<td> &nbsp; {{ record.value }} &nbsp; </a></td>
+		</tr>
+	{% endfor %}
+	</table>
+{% endif %}
+</div>
+{% endblock content %}

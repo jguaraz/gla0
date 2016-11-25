@@ -1,12 +1,24 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
-#from chartit import DataPool, Chart
+from django.contrib.auth import views, logout
+from django.contrib.auth.decorators import login_required
+from django.template.context_processors import request
 from .models import G
 from .forms import GForm
+
 # Create your views here.
+def home(request):
+    return render(request,"home.html")
+
+# this login required decorator is to not allow to any  
+# view without authenticating
+@login_required(login_url="login/")
+def login(request):
+    return render(request="login.html")
+
 def post_list(request):
     list = G.objects.filter(datetime__lte=timezone.now()).order_by('datetime')
-    return render(request, 'gl0/post_list.html', {'list': list})
+    return render(request, 'post_list.html', {'list': list})
 
 def g_new(request):
         if request.method == "POST":
@@ -19,27 +31,10 @@ def g_new(request):
                 return redirect('/', {'list': list})
         else:
             form = GForm()
-        return render(request, 'gl0/g_edit.html', {'form': form})
+        return render(request, 'g_edit.html', {'form': form})
 
-'''
 def chart1(request):
-    # Datapool
-    data = DataPool( series=[{'options': {'source': G.objects.all().order_by('datetime') },
-                            'terms': ['datetime','value']}]  )
-    # chart
-    cht = Chart( datasource = data,
-                 series_options = [ {'options':{
-                     type: 'line',
-                     'stacking': False }, 'terms': {'datetime' : ['value']}  }],
-                 chart_options =
-                    { 'title': {'text': 'Control de Glucemia'},
-                     'xAxis': {'title': {'text': 'Fecha/Hora'} } } 
-                 )
-    #Step 3: Send the PivotChart object to the template.
-    return render_to_response({'chart1': cht})
-'''    
-def chart1(request):
-    return render(request, 'gl0/chart1.html')
+    return render(request, 'chart1.html')
 
 def chart2(request, chartID = 'chart_ID', chart_type = 'line', chart_height = 500):
     data = ChartData.check_g_data()
@@ -54,7 +49,7 @@ def chart2(request, chartID = 'chart_ID', chart_type = 'line', chart_height = 50
         {"name": 'Promedio movil', "data": data['media']}
         ]
 
-    return render(request, 'gl0/chart2.html', {'chartID': chartID, 'chart': chart,
+    return render(request, 'chart2.html', {'chartID': chartID, 'chart': chart,
                                                     'series': series, 'title': title, 
                                                     'xAxis': xAxis, 'yAxis': yAxis})
 
@@ -73,3 +68,6 @@ class ChartData(object):
             data['media'].append((len(data['value']) < 30) and sum(data['value']) / float(len(data['value'])) or (sum(data['value']) / float(len(data['value']))) )
 
         return data
+    
+def guest(request):
+    return render(request,"guest.html")
