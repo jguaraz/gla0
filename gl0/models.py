@@ -2,9 +2,10 @@ from django.db import models
 from django.utils import timezone
 # Create your models here.
 class G(models.Model):
-    id_p = models.PositiveSmallIntegerField(default=1)
+#    id_p = models.PositiveSmallIntegerField(default=1)
     datetime = models.CharField(max_length=20)
     value = models.PositiveSmallIntegerField()
+    id_p = models.ForeignKey('auth.User')
 
     def publish(self):
         '''self.id_p = 1'''

@@ -1,14 +1,32 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
-from django.contrib.auth import views, logout
+from django.contrib.auth import views, logout, login
 from django.contrib.auth.decorators import login_required
 from django.template.context_processors import request
+from django.http import HttpResponseRedirect
+import time, datetime, string
+#from forms import UserForm
 from .models import G
-from .forms import GForm
+from .forms import GForm, UserForm
 
 # Create your views here.
 def home(request):
     return render(request,"home.html")
+
+
+def u_new(request):
+    if request.method == "POST":
+        form = UserForm(request.POST)
+        if form.is_valid():
+            #new_user = UserForm.Users.objects.create_user(**form.cleaned_data)
+            form.save()
+            #login(request.POST['username'])
+            # redirect, or however you want to get to the main view
+            return HttpResponseRedirect('login')
+    else:
+        form = UserForm() 
+
+    return render(request, 'u_new.html', {'form': form}) 
 
 # this login required decorator is to not allow to any  
 # view without authenticating
@@ -17,7 +35,7 @@ def login(request):
     return render(request="login.html")
 
 def post_list(request):
-    list = G.objects.filter(datetime__lte=timezone.now()).order_by('datetime')
+    list = G.objects.filter(id_p=request.user).order_by('datetime')
     return render(request, 'post_list.html', {'list': list})
 
 def g_new(request):
@@ -27,8 +45,9 @@ def g_new(request):
                 post = form.save(commit=False)
                 '''post.author = request.user
                 post.published_date = timezone.now() '''
+                post.id_p = request.user
                 post.save()
-                return redirect('/', {'list': list})
+                return redirect('/list', {'list': list})
         else:
             form = GForm()
         return render(request, 'g_edit.html', {'form': form})
@@ -37,14 +56,16 @@ def chart1(request):
     return render(request, 'chart1.html')
 
 def chart2(request, chartID = 'chart_ID', chart_type = 'line', chart_height = 500):
-    data = ChartData.check_g_data()
+    user = request.user
+    data = ChartData.check_g_data(user)
 
     chart = {"renderTo": chartID, "type": chart_type, "height": chart_height,}  
     title = {"text": 'Control Glucemia'}
-    xAxis = {"title": {"text": 'Fecha / Hora'}}
-    yAxis = {"title": {"text": 'Data'}}
+    xAxis = {"title": {"text": 'Fecha / Hora'}, "type": 'datetime', "dateTimeLabelFormats": {"month": "%e. %b", "year": "%b"}, "units": [['day', [1,5,10,15,20,25,30]], ['month',[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]], ['year', 'null']]}
+#    xAxis = {"title": {"text": 'Fecha / Hora'}, "type": 'linear'}
+    yAxis = {"title": {"text": 'Glucometer display'}}
     series = [
-        {"name": 'Fecha / Hora', "data": data['datetime']}, 
+        {"name": 'Fecha / Hora', "data": data['datax'] }, 
         {"name": 'Lectura', "data": data['value']},
         {"name": 'Promedio movil', "data": data['media']}
         ]
@@ -56,14 +77,16 @@ def chart2(request, chartID = 'chart_ID', chart_type = 'line', chart_height = 50
 
 
 class ChartData(object):    
-    def check_g_data():
-        data = {'datetime': [], 'value': [],
-                 'media': []}
+    def check_g_data(user):
+        data = {'datax': [], 'value': [],'media': []}
 
-        set = G.objects.all()
+        set = G.objects.filter(id_p=user).order_by('datetime')
+        #limit = time.mktime(datetime.datetime.strptime(set[0].datetime, '%Y-%m-%d %H:%M:%S').timetuple())
 
         for record in set:
-            data['datetime'].append(record.datetime)
+            #data['datetime'].append(record.datetime)
+            #data['datax'].append(time.mktime(datetime.datetime.strptime(record.datetime, '%Y-%m-%d %H:%M:%S').timetuple()) - limit )
+            data['datax'].append("Date(" + record.datetime[0:4] +", " + str(int(record.datetime[5:7]) - 1) + ", " + record.datetime[8:10] + ", " + record.datetime[11:13] + ", " + record.datetime[14:16] +  ",0,0)")
             data['value'].append(record.value)
             data['media'].append((len(data['value']) < 30) and sum(data['value']) / float(len(data['value'])) or (sum(data['value']) / float(len(data['value']))) )
 
