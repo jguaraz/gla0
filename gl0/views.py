@@ -5,7 +5,6 @@ from django.contrib.auth.decorators import login_required
 from django.template.context_processors import request
 from django.http import HttpResponseRedirect
 import time, datetime, string
-#from forms import UserForm
 from .models import G
 from .forms import GForm, UserForm
 
@@ -34,17 +33,20 @@ def u_new(request):
 def login(request):
     return render(request="login.html")
 
+# Display glucometer records
 def post_list(request):
-    list = G.objects.filter(id_p=request.user).order_by('datetime')
-    return render(request, 'post_list.html', {'list': list})
+    if request.user.is_authenticated:
+        list = G.objects.filter(id_p=request.user).order_by('datetime')
+        return render(request, 'post_list.html', {'list': list})
+    else:
+        return render(request,"registration/forbidden.html")
 
+# Adds glucometer records
 def g_new(request):
         if request.method == "POST":
             form = GForm(request.POST)
             if form.is_valid():
                 post = form.save(commit=False)
-                '''post.author = request.user
-                post.published_date = timezone.now() '''
                 post.id_p = request.user
                 post.save()
                 return redirect('/list', {'list': list})
@@ -52,30 +54,30 @@ def g_new(request):
             form = GForm()
         return render(request, 'g_edit.html', {'form': form})
 
-def chart1(request):
-    return render(request, 'chart1.html')
-
+# Displays chart based on gucometer recors
 def chart2(request, chartID = 'chart_ID', chart_type = 'line', chart_height = 500):
-    user = request.user
-    data = ChartData.check_g_data(user)
+    
+    if request.user.is_authenticated:
+        user = request.user
+        data = ChartData.check_g_data(user)
+        chart = {"renderTo": chartID, "type": chart_type, "height": chart_height,}  
+        title = {"text": 'Control Glucemia'}
+        xAxis = {"title": {"text": 'Fecha / Hora'}, "type": 'datetime', "dateTimeLabelFormats": {"month": "%e. %b", "year": "%b"}, "units": [['day', [1,5,10,15,20,25,30]], ['month',[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]], ['year', 'null']]}
+    #    xAxis = {"title": {"text": 'Fecha / Hora'}, "type": 'linear'}
+        yAxis = {"title": {"text": 'Glucometer display'}}
+        series = [
+            {"name": 'Fecha / Hora', "data": data['datax'] }, 
+            {"name": 'Lectura', "data": data['value']},
+            {"name": 'Promedio movil', "data": data['media']}
+            ]
+    
+        return render(request, 'chart2.html', {'chartID': chartID, 'chart': chart,
+                   'series': series, 'title': title,  'xAxis': xAxis, 'yAxis': yAxis})
+    else:
+        return render(request,"registration/forbidden.html")
 
-    chart = {"renderTo": chartID, "type": chart_type, "height": chart_height,}  
-    title = {"text": 'Control Glucemia'}
-    xAxis = {"title": {"text": 'Fecha / Hora'}, "type": 'datetime', "dateTimeLabelFormats": {"month": "%e. %b", "year": "%b"}, "units": [['day', [1,5,10,15,20,25,30]], ['month',[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]], ['year', 'null']]}
-#    xAxis = {"title": {"text": 'Fecha / Hora'}, "type": 'linear'}
-    yAxis = {"title": {"text": 'Glucometer display'}}
-    series = [
-        {"name": 'Fecha / Hora', "data": data['datax'] }, 
-        {"name": 'Lectura', "data": data['value']},
-        {"name": 'Promedio movil', "data": data['media']}
-        ]
 
-    return render(request, 'chart2.html', {'chartID': chartID, 'chart': chart,
-                                                    'series': series, 'title': title, 
-                                                    'xAxis': xAxis, 'yAxis': yAxis})
-
-
-
+# Class used by chart2 view
 class ChartData(object):    
     def check_g_data(user):
         data = {'datax': [], 'value': [],'media': []}
@@ -91,6 +93,10 @@ class ChartData(object):
             data['media'].append((len(data['value']) < 30) and sum(data['value']) / float(len(data['value'])) or (sum(data['value']) / float(len(data['value']))) )
 
         return data
-    
+
+# Displays guest page    
 def guest(request):
     return render(request,"guest.html")
+
+def forbidden(request):
+    return render(request,"registration/forbidden.html")

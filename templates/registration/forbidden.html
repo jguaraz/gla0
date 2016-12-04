@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block content %}
+	{% if user.is_authenticated %}
+		<h1 align="center">This is home</h1> 
+	{% else %}
+		<h1 align="center">Forbidden</h1>
+		<p></p>
+		<p>You are not authorized to access this page. Please sign in</p>
+	{% endif %}
+{% endblock %}
