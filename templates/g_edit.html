@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-
+{% load staticfiles %}
 {% block content %}
     <h1>Nuevo registro</h1>
     <form method="POST" class="post-form">{% csrf_token %}
@@ -7,3 +7,19 @@
         <button type="submit" class="save btn btn-default">Save</button>
     </form>
 {% endblock %}
+<!--  new block codes  -->
+        {% block javascript %}
+			<script type="text/javascript" src="{% static 'js/moment.js' %}"></script>
+			<script type="text/javascript" src="{% static 'js/bootstrap-datetimepicker.js' %}"></script>
+		{% endblock %}
+		{% block extrajs %}
+						<script type="text/javascript">
+						    $(function () {
+						        $('#datetimepicker').datetimepicker({
+						            inline: true,
+						            sideBySide: true,
+						           	format: 'YYYY-MM-DD HH:mm:ss'
+						        });
+						    });
+						</script>
+		{% endblock %}

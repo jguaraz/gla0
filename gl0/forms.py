@@ -10,6 +10,7 @@ class GForm(forms.ModelForm):
     class Meta:
         model = G
         fields = ('datetime', 'value',)
+        widgets = {'datetime': forms.DateInput(attrs={'id': 'datetimepicker'})}
         
 #log/forms.py
 
